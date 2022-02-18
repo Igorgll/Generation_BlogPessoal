@@ -1,7 +1,6 @@
 package org.generation.blog.model;
 
 import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +13,7 @@ import javax.validation.constraints.Size;
 
 @Entity 
 @Table(name = "postagem") // No MySQL isso vira uma tabela, o nome dela será postagem
-public class postagem {
+public class Postagem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // será uma chave primária
