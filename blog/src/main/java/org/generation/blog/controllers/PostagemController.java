@@ -1,4 +1,4 @@
-package org.generation.blog.controller;
+package org.generation.blog.controllers;
 
 import java.util.List;
 
