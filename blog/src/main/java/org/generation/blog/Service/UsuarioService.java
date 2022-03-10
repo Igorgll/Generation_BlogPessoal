@@ -9,9 +9,9 @@ import org.generation.blog.model.Usuario;
 import org.generation.blog.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsuarioService {
@@ -19,31 +19,21 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
-    public Usuario validaBancoDuplicidade (Usuario usuario ) {
-        Usuario c1 = new Usuario();
-        c1 = repository.findByUsuarioContainingIgnoreCase(usuario.getUsuario());
-        if(c1 == null){
-            
-        System.out.println("Não existe esse usuário");    
-        return CadastrarUsuario(usuario);
-        
+    public Optional<Usuario> CadastrarUsuario(Usuario usuario){
 
+        Optional<Usuario> novoUsuario = repository.findByUsuario(usuario.getUsuario());
+
+        if(novoUsuario.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }else {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            System.out.println("Já existe");
-            return c1;
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            String passwordEncoder = encoder.encode(usuario.getSenha());
+            usuario.setSenha(passwordEncoder);
+
+            return Optional.ofNullable(repository.save(usuario));
         }
-        
-    }
-
-
-    public Usuario CadastrarUsuario(Usuario usuario) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        String senhaEncoder = encoder.encode(usuario.getSenha());
-        usuario.setSenha(senhaEncoder);
-
-        return repository.save(usuario);
     }
     
     public Optional<UserLogin> Logar(Optional<UserLogin> user){
