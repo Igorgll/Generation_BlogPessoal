@@ -8,8 +8,10 @@ import org.generation.blog.model.UserLogin;
 import org.generation.blog.model.Usuario;
 import org.generation.blog.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsuarioService {
@@ -17,13 +19,21 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
-    public Usuario CadastrarUsuario(Usuario usuario) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    public Optional<Usuario> CadastrarUsuario(Usuario usuario){
 
-        String senhaEncoder = encoder.encode(usuario.getSenha());
-        usuario.setSenha(senhaEncoder);
+        Optional<Usuario> novoUsuario = repository.findByUsuario(usuario.getUsuario());
 
-        return repository.save(usuario);
+        if(novoUsuario.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }else {
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            String passwordEncoder = encoder.encode(usuario.getSenha());
+            usuario.setSenha(passwordEncoder);
+
+            return Optional.ofNullable(repository.save(usuario));
+        }
     }
     
     public Optional<UserLogin> Logar(Optional<UserLogin> user){

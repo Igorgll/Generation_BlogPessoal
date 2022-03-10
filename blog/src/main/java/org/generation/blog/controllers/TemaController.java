@@ -17,18 +17,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@Tag(name = "Recursos dos Temas", description = "Administração dos temas")
 @RequestMapping("/tema")
 public class TemaController {
     
     @Autowired 
     private TemaRepository repository;
 
+    @Operation(summary = "Busca lista de temas")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Retorna todos os temas"),
+			@ApiResponse(responseCode = "400", description = "Retorno sem temas"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+	})
+
     @GetMapping 
     public ResponseEntity<List<Tema>> getAll() {
         return ResponseEntity.ok(repository.findAll());
     }
+
+    @Operation(summary = "Busca temas por id")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Retorna temas existentes"),
+			@ApiResponse(responseCode = "400", description = "Tema inexistente"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+	})
 
     @GetMapping("/{id}")
     public ResponseEntity<Tema> getById(@PathVariable long id) {
@@ -42,16 +62,37 @@ public class TemaController {
         return ResponseEntity.ok(repository.findAllByDescricaoContainingIgnoreCase(nome));
     }
 
+    @Operation(summary = "Cria novo tema")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Tema criado com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Erro na requisição"),
+            @ApiResponse(responseCode = "422", description = "Tema já existente"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+	})
+
     @PostMapping 
     public ResponseEntity<Tema> post (@RequestBody Tema tema) {
         return ResponseEntity.status(HttpStatus.CREATED)
         .body(repository.save(tema));
     }
 
+    @Operation(summary = "Atualiza Tema existente")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Retorna Tema Atualizado"),
+			@ApiResponse(responseCode = "400", description = "Erro na requisição"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+	})
+
     @PutMapping 
     public ResponseEntity<Tema> put (@RequestBody Tema tema) {
         return ResponseEntity.ok(repository.save(tema));
     }
+
+    @Operation(summary = "Deleta Tema existente")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Tema deletado"),
+			@ApiResponse(responseCode = "400", description = "Id de tema inválido"),
+	})
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id){
