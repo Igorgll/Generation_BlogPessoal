@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,14 +45,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Retorno sem Usuarios"),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
     })
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Usuario>> getAll() {
-        List<Usuario> list = repository.findAll();
-        if (list.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não encontrado");
-        } else {
-            return ResponseEntity.ok(repository.findAll());
-        }
+            return ResponseEntity.ok(repository.findAll()); 
     }
 
     @Operation(summary = "Busca usuario por id")
@@ -69,22 +62,6 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Busca usuario por id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna Usuario existente"),
-            @ApiResponse(responseCode = "204", description = "Retorno inexistente"),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
-    })
-    @GetMapping("/pesquisa")
-    public ResponseEntity<List<Usuario>> getByNome(@RequestParam(defaultValue = "") String nome) {
-        List<Usuario> usuarioLista = repository.findAllByNomeContainingIgnoreCase(nome);
-
-        if (usuarioLista.isEmpty()) {
-            return ResponseEntity.status(204).build();
-        } else {
-            return ResponseEntity.status(200).body(usuarioLista);
-        }
-    }
 
     @Operation(summary = "Faz login do Usuario")
     @ApiResponses(value = {
@@ -109,7 +86,7 @@ public class UsuarioController {
     @PostMapping("/cadastrar")
     public ResponseEntity<Usuario> Post(@Valid @RequestBody Usuario usuario) {
         return usuarioService.CadastrarUsuario(usuario).map(resp -> ResponseEntity.status(201).body(resp))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                .orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 
     @Operation(summary = "Atualiza Usuario existente")
