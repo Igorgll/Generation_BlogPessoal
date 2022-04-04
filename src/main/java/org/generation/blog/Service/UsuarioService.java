@@ -46,11 +46,10 @@ public class UsuarioService {
                 String auth = user.get().getUsuario() + ":" + user.get().getSenha();
                 byte[] encoderAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
                 String authHeader = "Basic " + new String(encoderAuth);
-
-                user.get().setUsuario(usuario.get().getUsuario());
-                user.get().setNome(usuario.get().getNome());
-                user.get().setFoto(usuario.get().getFoto());
+                
                 user.get().setToken(authHeader);
+                user.get().setNome(usuario.get().getNome());
+                user.get().setUsuario(usuario.get().getUsuario());
                 user.get().setSenha(usuario.get().getSenha());
                 user.get().setFoto(usuario.get().getFoto());
                 user.get().setTipo(usuario.get().getTipo());
@@ -62,5 +61,4 @@ public class UsuarioService {
         return null;
 
     }
-
 }
