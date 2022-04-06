@@ -71,8 +71,6 @@ public class UsuarioService {
 				if (buscaUsuario.get().getId() != usuario.getId())
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
 			}
-			
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
             String passwordEncoder = encoder.encode(usuario.getSenha());
             usuario.setSenha(passwordEncoder);
