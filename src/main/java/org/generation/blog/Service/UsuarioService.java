@@ -62,4 +62,30 @@ public class UsuarioService {
         return null;
 
     }
+
+    public Optional<Usuario> atualizarUsuario(Usuario usuario) {
+
+		if (repository.findById(usuario.getId()).isPresent()) {
+			Optional<Usuario> buscaUsuario = repository.findByUsuario(usuario.getUsuario());
+
+			if (buscaUsuario.isPresent()) {				
+				if (buscaUsuario.get().getId() != usuario.getId())
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
+			}
+			
+			usuario.setSenha(criptografarSenha(usuario.getSenha()));
+
+			return Optional.of(repository.save(usuario));
+		} 
+			
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);		
+	}
+
+    private String criptografarSenha(String senha) {
+
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String senhaEncoder = encoder.encode(senha);
+
+		return senhaEncoder;
+	}
 }
