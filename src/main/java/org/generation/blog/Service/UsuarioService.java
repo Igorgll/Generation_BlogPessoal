@@ -52,7 +52,7 @@ public class UsuarioService {
 			return Optional.of(repository.save(usuario));
 		}
 
-		return Optional.empty();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);
 	}
 
     public Optional<UserLogin> Logar(Optional<UserLogin> user) {
