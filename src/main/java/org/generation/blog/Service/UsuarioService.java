@@ -17,53 +17,48 @@ import org.springframework.web.server.ResponseStatusException;
 public class UsuarioService {
 
     @Autowired
-    private UsuarioRepository repository;
+	private UsuarioRepository repository;
+	
+	public Optional<Usuario> CadastrarUsuario(Usuario usuario) {
+		Optional<Usuario> optional = repository.findByUsuario(usuario.getUsuario());
+		if (optional.isPresent()) {
+			return Optional.empty();
+		}
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		
+		String  senhaEncoder = encoder.encode(usuario.getSenha());
+		usuario.setSenha(senhaEncoder);
+		
+		return Optional.ofNullable(repository.save(usuario));
+	}
+	
 
-    public Optional<Usuario> CadastrarUsuario(Usuario usuario) {
+	public Optional<UserLogin> Logar(Optional<UserLogin> user){
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		Optional <Usuario> usuario = repository.findByUsuario(user.get().getUsuario());
 
-        Optional<Usuario> novoUsuario = repository.findByUsuario(usuario.getUsuario());
-
-        if (novoUsuario.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
-        } else {
-
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-            String passwordEncoder = encoder.encode(usuario.getSenha());
-            usuario.setSenha(passwordEncoder);
-
-            return Optional.ofNullable(repository.save(usuario));
-        }
-    }
-
-    public Optional<UserLogin> Logar(Optional<UserLogin> user) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        Optional<Usuario> usuario = repository.findByUsuario(user.get().getUsuario());
-
-        if (usuario.isPresent()) {
-            if (encoder.matches(user.get().getSenha(), usuario.get().getSenha())) {
-
-                String auth = user.get().getUsuario() + ":" + user.get().getSenha();
-                byte[] encoderAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-                String authHeader = "Basic " + new String(encoderAuth);
-                
-                user.get().setToken(authHeader);
-                user.get().setNome(usuario.get().getNome());
-                user.get().setUsuario(usuario.get().getUsuario());
-                user.get().setSenha(usuario.get().getSenha());
-                user.get().setFoto(usuario.get().getFoto());
-                user.get().setTipo(usuario.get().getTipo());
-                user.get().setId(usuario.get().getId());
-
-                return user;
-            }
-        }
-
-        return null;
-
-    }
-
-    public Optional<Usuario> atualizarUsuario(Usuario usuario) {
+		if(usuario.isPresent())	{
+			if(encoder.matches(user.get().getSenha(), usuario.get().getSenha())){
+				String auth = user.get().getUsuario() + ":" +user.get().getSenha();
+				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+				String authHeader ="Basic " + new String(encodedAuth);
+				
+				user.get().setToken(authHeader);
+				user.get().setId(usuario.get().getId());
+				user.get().setNome(usuario.get().getNome());
+				user.get().setSenha(usuario.get().getSenha());
+				user.get().setUsuario(usuario.get().getUsuario());
+				user.get().setFoto(usuario.get().getFoto());
+				user.get().setTipo(usuario.get().getTipo());
+				
+				return user;
+			}
+		}
+        return Optional.empty();	
+	}
+	
+	
+	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
 
 		if (repository.findById(usuario.getId()).isPresent()) {
 			Optional<Usuario> buscaUsuario = repository.findByUsuario(usuario.getUsuario());
@@ -78,14 +73,15 @@ public class UsuarioService {
 			return Optional.of(repository.save(usuario));
 		} 
 			
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado!", null);		
-	}
+		return Optional.empty();		
+	}	
 
-    private String criptografarSenha(String senha) {
+	private String criptografarSenha(String senha) {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String senhaEncoder = encoder.encode(senha);
 
 		return senhaEncoder;
 	}
+	
 }
