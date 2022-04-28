@@ -26,21 +26,21 @@ public class UsuarioRepositoryTest {
     void start() {
         usuarioRepository.deleteAll();
 
-        usuarioRepository.save(new Usuario(0L, "José da Silva", "josezin", "joao@email.com.br", "123456"));
+        usuarioRepository.save(new Usuario(0L, "José da Silva", "josezin", "joao@email.com.br", "12345678"));
 
-        usuarioRepository.save(new Usuario(0L, "Eduardo Silva", "eduardin", "manuela@email.com.br", "123456"));
+        usuarioRepository.save(new Usuario(0L, "Maria Silva", "maria", "manuela@email.com.br", "12345678"));
 
-        usuarioRepository.save(new Usuario(0L, "Paulo Silva", "paulin", "adriana@email.com.br", "123456"));
+        usuarioRepository.save(new Usuario(0L, "Paulo Silva", "paulin", "adriana@email.com.br", "12345678"));
 
-        usuarioRepository.save(new Usuario(0L, "Roberto Rodrigues", "robertin", "paulo@email.com.br", "123456"));
+        usuarioRepository.save(new Usuario(0L, "Roberto Rodrigues", "robertin", "paulo@email.com.br", "12345678"));
     }
 
     @Test
     @DisplayName("Retorna 1 usuario")
     public void deveRetornarUmUsuario() {
 
-        Optional<Usuario> usuario = usuarioRepository.findByUsuario("eduardin");
-        assertTrue(usuario.get().getUsuario().equals("eduardin"));
+        Optional<Usuario> usuario = usuarioRepository.findByUsuario("manuela@email.com.br");
+        assertTrue(usuario.get().getUsuario().equals("manuela@email.com.br"));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class UsuarioRepositoryTest {
         List<Usuario> listaDeUsuarios = usuarioRepository.findAllByNomeContainingIgnoreCase("Silva");
         assertEquals(3, listaDeUsuarios.size()); // se retornar 3 o test será aprovado
         assertTrue(listaDeUsuarios.get(0).getNome().equals("José da Silva"));
-        assertTrue(listaDeUsuarios.get(1).getNome().equals("Eduardo Silva"));
+        assertTrue(listaDeUsuarios.get(1).getNome().equals("Maria Silva"));
         assertTrue(listaDeUsuarios.get(2).getNome().equals("Paulo Silva"));
     }
 

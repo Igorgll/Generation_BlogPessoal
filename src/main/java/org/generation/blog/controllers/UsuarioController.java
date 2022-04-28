@@ -47,7 +47,12 @@ public class UsuarioController {
     })
     @GetMapping
     public ResponseEntity<List<Usuario>> getAll() {
-            return ResponseEntity.ok(repository.findAll()); 
+        List<Usuario> list = repository.findAll();
+        if (list.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }else {
+            return ResponseEntity.status(200).body(list);
+        } 
     }
 
     @Operation(summary = "Busca usuario por id")
